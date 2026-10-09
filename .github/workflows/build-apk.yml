@@ -1,0 +1,36 @@
+name: Build CatStretchHelper APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Extrair projeto
+        run: |
+          mkdir extracted
+          unzip -q CatStretchHelper-source-v2.zip -d extracted
+          ls -la extracted
+      - name: Compilar APK
+        run: gradle -p extracted/CatStretchHelper :app:assembleDebug
+      - name: Salvar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CatStretchHelper-debug-apk
+          path: extracted/CatStretchHelper/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
