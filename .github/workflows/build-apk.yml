@@ -39,7 +39,7 @@ jobs:
           p = root / 'java/com/alison/catstretch/ProjectionUserService.java'
           s = p.read_text()
           old = 'public final class ProjectionUserService extends IProjectionService.Stub {'
-          new = 'public final class ProjectionUserService extends android.app.Service {\n    private final IProjectionService.Stub binder = new IProjectionService.Stub() {\n        @Override public String applyStretch(int rotation, int sw, int sh, int tw, int th) { return ProjectionUserService.this.applyStretch(rotation, sw, sh, tw, th); }\n        @Override public String resetProjection(int rotation) { return ProjectionUserService.this.resetProjection(rotation); }\n    };\n    @Override public IBinder onBind(android.content.Intent intent) { return binder; }'
+          new = 'public final class ProjectionUserService extends rikka.shizuku.Shizuku.UserService {\n    private final IProjectionService.Stub binder = new IProjectionService.Stub() {\n        @Override public String applyStretch(int rotation, int sw, int sh, int tw, int th) { return ProjectionUserService.this.applyStretch(rotation, sw, sh, tw, th); }\n        @Override public String resetProjection(int rotation) { return ProjectionUserService.this.resetProjection(rotation); }\n    };\n    @Override public IBinder onBind(android.content.Intent intent) { return binder; }'
           if old not in s:
               raise SystemExit('Declaração da classe não encontrada; arquivo não foi alterado')
           s = s.replace(old, new, 1)
