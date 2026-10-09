@@ -12,22 +12,42 @@ jobs:
     steps:
       - name: Baixar projeto
         uses: actions/checkout@v4
+
       - name: Configurar Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+
       - name: Extrair projeto
         run: |
           mkdir extracted
           unzip -q CatStretchHelper-source-v2.zip -d extracted
           ls -la extracted
+
+      - name: Habilitar AIDL e BuildConfig
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('extracted/CatStretchHelper/app/build.gradle')
+          s = p.read_text()
+          marker = 'android {\n'
+          if marker not in s:
+              raise SystemExit('Bloco android não encontrado')
+          if 'buildFeatures {' not in s:
+              s = s.replace(marker, marker + '    buildFeatures {\n        aidl true\n        buildConfig true\n    }\n', 1)
+          p.write_text(s)
+          print('Configuração aplicada')
+          PY
+
       - name: Compilar APK
         run: gradle -p extracted/CatStretchHelper :app:assembleDebug
+
       - name: Salvar APK
         uses: actions/upload-artifact@v4
         with:
